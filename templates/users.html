@@ -1,0 +1,55 @@
+{% extends 'layout.html' %}
+{% block body %}
+<main>
+  <section class="py-5 text-center container">
+    <div class="row py-lg-5">
+      <div class="col-lg-6 col-md-8 mx-auto">
+        <h1 class="fw-light">Manage Users</h1>
+        <p class="lead text-muted"> Manage users activities at ease. </p>
+
+      </div>
+    </div><hr>
+  </section>
+  <div class="container">
+    <h2 class="text-center text-secondary">User Data</h2><br>
+    <table class="table table-hover table-bordered">
+      <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Phone Number</th>
+        <th>Books issued</th>
+        <th>Books returned</th>
+        <th>Dues</th>
+        <th>Paid</th>
+        <th>Registered Date</th>
+        <th></th>
+        <th></th>
+      </tr>
+      </thead>
+      {% for user in users %}
+        <tr>
+          <td>{{user.id}}</td>
+          <td>{{user.username}}</td>
+          <td>{{user.email}}</td>
+          <td>{{user.phone}}</td>
+          <td>{{user.issued}}</td>
+          <td>{{user.returned}}</td>
+          <td>{{user.dues}}</td>
+          <td>{{user.paid}}</td>
+          <td>{{user.register_date}}</td>
+          <td><a href="edit_user/{{user.id}}" class="btn btn-sm btn-outline-secondary">Edit</a></td>
+          <td>
+            <form action="{{url_for('delete_user', id=user.id)}}" method="post">
+              <input type="hidden" name="_method" value="DELETE">
+              <input type="submit" value="Delete" class="btn btn-sm btn-outline-danger">
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div><br><br>
+
+</main>
+{% endblock %}
