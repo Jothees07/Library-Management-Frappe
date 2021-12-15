@@ -1,0 +1,24 @@
+
+{% extends 'layout.html' %}
+
+{% block body %}
+  <div class="container">
+  <h1 class="text-center text-secondary">Search Books</h1><hr>
+  <form method="POST" action="">
+    <div class="form-group">
+      <label>Enter Book Name or Author Name</label>
+      <input type="text" name="search" class="form-control" list="search" value={{request.form.search}}>
+      <datalist id="search">
+        {% for key in keys %}
+          <option>{{key}}</option>
+        {% endfor %}
+      </datalist>
+    </div>
+    <br>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+  </div>
+<br><br>
+
+
+{% endblock %}

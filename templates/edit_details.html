@@ -1,0 +1,22 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+  <div class="container">
+  <h1>Edit Details</h1>
+  {% from 'addons/formhelper.html' import render_field %}
+  <form method="POST" action="">
+
+    <div class="form-group">
+      {{ render_field(form.username, class_="form-control") }}
+    </div>
+    <div class="form-group">
+      {{ render_field(form.email, class_="form-control") }}
+    </div>
+    <div class="form-group">
+      {{ render_field(form.phone, class_="form-control") }}
+    </div>
+    <br>
+    <p><input class="btn btn-primary" type="submit" value="Submit"></p>
+  </form>
+  </div>
+{% endblock %}
