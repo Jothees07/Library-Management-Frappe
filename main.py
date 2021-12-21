@@ -616,23 +616,16 @@ def mybooks(username):
         return render_template('mybooks.html', result=result)
 
 
-
 @app.route('/issue/<string:title>')
 @check_login
 def issue(title):
-
     cur = mysql.connection.cursor()
-
     result = cur.execute("SELECT * FROM users WHERE username LIKE %s ", [session['username']])
-
     user = cur.fetchone()
-
-    if user['issued'] is None :
+    if user['issued'] is None:
         book_issued = 0
     else:
         book_issued = int(user['issued'])
-    cur.close()
-
     if title in new_list:
         data_index = new_list.index(title)
         data_new = data[data_index]
@@ -640,115 +633,44 @@ def issue(title):
         book_author = data_new['authors']
         if 'availability' not in data_new.keys():
             data_new['availability'] = 0
-
         book_availability = int(data_new['availability'])
-
     else:
-        cur = mysql.connection.cursor()
-
         result = cur.execute("SELECT * FROM books WHERE title LIKE %s ", [title])
-
         book = cur.fetchone()
-
         book_title = book['title']
         book_author = book['author']
         book_availability = int(book['availability'])
-        cur.close()
-
-    cur = mysql.connection.cursor()
-    result1 = cur.execute("SELECT * FROM issued WHERE username LIKE %s",[session['username']])
+    result1 = cur.execute("SELECT * FROM issued WHERE username LIKE %s", [session['username']])
     check = cur.fetchall()
+    check_title = []
+    for a in check:
+        check_title.append(a['title'])
     now = datetime.datetime.now()
     if book_availability > 0:
-        if result1 > 0:
-            for a in check:
-                check_user = a['username']
-                check_title = a['title']
-                if session['username'] != check_user and title != check_title:
-                    cur = mysql.connection.cursor()
-
-                    cur.execute("INSERT INTO issued (username, title, author) VALUES(%s, %s, %s)", (session['username'], book_title, book_author))
-
-                    mysql.connection.commit()
-
-                    cur.execute("INSERT INTO report (username, title, issued_time) VALUES(%s, %s, %s)", (session['username'], book_title, now))
-
-                    mysql.connection.commit()
-
-                    cur.close()
-
-                    book_availability -= 1
-                    book_issued += 1
-                    if title in new_list:
-                        data_new['availability'] = book_availability
-
-                    else:
-                        cur = mysql.connection.cursor()
-
-                        cur.execute("UPDATE books SET availability=%s WHERE title = %s", (book_availability, title))
-
-
-                        mysql.connection.commit()
-
-                        cur.close()
-
-
-                    cur = mysql.connection.cursor()
-
-                    cur.execute("UPDATE users SET issued=%s WHERE username = %s", (book_issued, session['username']))
-
-                    mysql.connection.commit()
-
-                    cur.close()
-
-                    flash('The book is added successfully!!', 'success')
-
-                    return redirect(url_for('home'))
-                else:
-                    flash('The book is already in your list','warning')
-                    return redirect(url_for('home'))
+        if title in check_title:
+            flash('The book is already in your list', 'warning')
+            return redirect(url_for('home'))
         else:
-            cur = mysql.connection.cursor()
-
-            cur.execute("INSERT INTO issued (username, title, author) VALUES(%s, %s, %s)", (session['username'], book_title, book_author))
-
+            cur.execute("INSERT INTO issued (username, title, author) VALUES(%s, %s, %s)",
+                        (session['username'], book_title, book_author))
             mysql.connection.commit()
-
-            cur.execute("INSERT INTO report (username, title, issued_time) VALUES(%s, %s, %s)", (session['username'], book_title, now))
-
+            cur.execute("INSERT INTO report (username, title, issued_time) VALUES(%s, %s, %s)",
+                        (session['username'], book_title, now))
             mysql.connection.commit()
-
-            cur.close()
-
             book_availability -= 1
             book_issued += 1
             if title in new_list:
                 data_new['availability'] = book_availability
-
             else:
-                cur = mysql.connection.cursor()
-
                 cur.execute("UPDATE books SET availability=%s WHERE title = %s", (book_availability, title))
-
                 mysql.connection.commit()
-
-                cur.close()
-
-            cur = mysql.connection.cursor()
-
             cur.execute("UPDATE users SET issued=%s WHERE username = %s", (book_issued, session['username']))
-
             mysql.connection.commit()
-
             cur.close()
-
             flash('The book is added successfully!!', 'success')
-
             return redirect(url_for('home'))
-
     else:
         flash('The book is currently unavailable!!', 'danger')
-
         return redirect(url_for('home'))
 
 @app.route('/delete_book_list/<string:title>', methods=['POST'])
